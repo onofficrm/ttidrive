@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   ftp-deploy:
@@ -12,6 +13,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Verify FTP secrets
+        run: |
+          missing=0
+          [ -z "${{ secrets.FTP_SERVER }}" ] && echo "::error::FTP_SERVER secret이 없습니다 (Repository secrets에 정확히 FTP_SERVER 이름으로 등록)" && missing=1
+          [ -z "${{ secrets.FTP_USERNAME }}" ] && echo "::error::FTP_USERNAME secret이 없습니다" && missing=1
+          [ -z "${{ secrets.FTP_PASSWORD }}" ] && echo "::error::FTP_PASSWORD secret이 없습니다" && missing=1
+          [ -z "${{ secrets.FTP_PORT }}" ] && echo "::error::FTP_PORT secret이 없습니다" && missing=1
+          [ "$missing" -eq 1 ] && exit 1
+          echo "FTP secrets 확인 완료"
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

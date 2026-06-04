@@ -19,45 +19,35 @@ jobs:
           missing=0
           [ -z "${{ secrets.SERVER_HOST }}" ] && echo "::error::SERVER_HOST secret이 없습니다" && missing=1
           [ -z "${{ secrets.SERVER_USER }}" ] && echo "::error::SERVER_USER secret이 없습니다" && missing=1
-          [ -z "${{ secrets.SERVER_SSH_KEY }}" ] && echo "::error::SERVER_SSH_KEY secret이 없습니다" && missing=1
+          [ -z "${{ secrets.SERVER_PASSWORD }}" ] && echo "::error::SERVER_PASSWORD secret이 없습니다 (FTP 비밀번호 등록 필요)" && missing=1
+          [ -z "${{ secrets.SERVER_PORT }}" ] && echo "::error::SERVER_PORT secret이 없습니다" && missing=1
           [ "$missing" -eq 1 ] && exit 1
           echo "Deployment secrets 확인 완료"
 
-      - name: Load deployment SSH key
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-
-      - name: Deploy via rsync over SSH
-        env:
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_PORT: ${{ secrets.SERVER_PORT }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-        run: |
-          set -euo pipefail
-
-          : "${SERVER_HOST:?Missing SERVER_HOST secret}"
-          : "${SERVER_USER:?Missing SERVER_USER secret}"
-
-          PORT="${SERVER_PORT:-22}"
-          REMOTE="${SERVER_USER}@${SERVER_HOST}:~/public_html/"
-
-          mkdir -p ~/.ssh
-          ssh-keyscan -p "$PORT" "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
-
-          rsync -avz --delete \
-            -e "ssh -p $PORT -o StrictHostKeyChecking=accept-new" \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude '.DS_Store' \
-            --exclude '.vscode/' \
-            --exclude '._*' \
-            --exclude '_BUILDER_INPUT/' \
-            --exclude 'data/' \
-            --exclude 'cache/' \
-            --exclude 'session/' \
-            --exclude 'tmp/' \
-            --exclude '*.log' \
-            --exclude '.env' \
-            --exclude '.env.*' \
-            ./ "$REMOTE"
+          server: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          protocol: ftp
+          local-dir: ./
+          server-dir: /public_html/
+          state-name: ttidrive-deploy-v1
+          log-level: minimal
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/.DS_Store
+            **/.vscode/**
+            _backup_transfer_*/
+            **/_backup_transfer_*/
+            _BUILDER_INPUT/**
+            data/**
+            cache/**
+            session/**
+            tmp/**
+            *.log
+            .env
+            .env.*

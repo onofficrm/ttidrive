@@ -1,5 +1,12 @@
 [
   {
+    "id": "ttidrive",
+    "name": "띠띠빵빵 운전연수",
+    "path": "ttidrive",
+    "entry": "index.html",
+    "created_at": "2026-06-05 09:41:00"
+  },
+  {
     "id": "sample-landing",
     "name": "[샘플] 랜딩 페이지 (비활성)",
     "path": "sample-landing",

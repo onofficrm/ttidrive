@@ -8,8 +8,8 @@ if (!defined('_GNUBOARD_')) {
 }
 
 $site_config = array(
-    'site_name'           => '샘플 사이트',
-    'site_desc'           => '빌더 디자인 적용이 쉬운 그누보드 베이스 템플릿',
+    'site_name'           => '띠띠빵빵 운전연수',
+    'site_desc'           => '프리미엄 방문 도로연수 · 초보 운전연수 전문',
     'company_name'        => '회사명',
     'ceo_name'            => '대표자명',
     'business_no'         => '000-00-00000',
@@ -49,6 +49,8 @@ $site_config = array(
     'meta_pixel_id'       => '',
     'naver_analytics_id'  => '',
     'kakao_pixel_id'      => '',
+    /* 빌더 bridge 홈 (plugin/onoff-builder-bridge) — upload.php 에 ttidrive ID 로 ZIP 업로드 */
+    'home_builder_bridge_id' => 'ttidrive',
     /* 선택 항목 (비워 두면 기본값 사용) */
     'fax'                 => '',
     'sales_no'            => '',
